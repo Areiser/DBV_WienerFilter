@@ -1,27 +1,13 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon Dec 23 15:28:43 2019
-
-@author: Olivier
-"""
-
-
 import cv2
 import numpy as np
 from matplotlib import pyplot as plt
 
-
 imgRGB = cv2.imread('input2.jpg')
 img = cv2.cvtColor(imgRGB, cv2.COLOR_BGR2GRAY)
-#cv2.imshow('Original', img)
 
-sigma = 1
 
-dimension= img.shape
-noise =  np.random.normal(0, sigma, size=(dimension[0], dimension[1]))
-noise = noise.reshape(img.shape[0],img.shape[1]).astype('uint8')
+### Apply Motion Blur
 
-print (noise)
 size = 150
 
 # generating the kernel
@@ -32,10 +18,16 @@ kernel_motion_blur = kernel_motion_blur / size
 
 # applying the kernel to the input image
 imageWithMotionBlur = cv2.filter2D(img, -1, kernel_motion_blur)
-output2 = cv2.filter2D(img, -1, kernel_motion_blur2)
 
-#Adding the noise to the blurred image
-output3 =  cv2.add(imageWithMotionBlur, noise)
+
+### Adding the noise to the blurred image
+
+# Higher is more intense
+STD_DEV = 15
+# Create noise with the same shape as the image, random normal distribution
+noise = np.random.normal(size = img.shape, loc=0, scale=STD_DEV)
+
+output3 =  np.clip((imageWithMotionBlur + noise), 0, 255).astype('uint8')
 noisy_output = cv2.cvtColor(output3, cv2.COLOR_GRAY2RGB)
 
 
@@ -51,8 +43,3 @@ plt.show()
 print("\n\n\nMotion Blur + Noise")
 plt.imshow(noisy_output)
 plt.show()
-#plt.imshow(output3)
-
-
-#cv2.imshow('Motion Blur2', output2)
-#cv2.waitKey(30000)
