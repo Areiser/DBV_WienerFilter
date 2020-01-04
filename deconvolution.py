@@ -16,7 +16,7 @@ H = np.fft.fft2(image)
 # Frequencies of PSF
 P=np.fft.fft2(psf)
 
-# Create noise with standard deviation
+# Create noise with standard deviation 5
 STD_DEV = 5
 noise = np.random.normal(size = H.shape, loc=0, scale=STD_DEV)
 # H * P = apply point spread function to motion blur image
@@ -75,5 +75,60 @@ plt.imshow(restored_image_low_k,cmap="gray",vmin=0,vmax=255)
 plt.title("Deconvolved image using low K")
 plt.colorbar()
 
+### Perfect deconvolution with weaker motion blur
+
+# different PSF: only use 100 px to get weaker blur
+psf = np.zeros((image.shape[0], image.shape[1]))
+psf[int(psf.shape[0]/2), int(psf.shape[1]/2 - 50):int(psf.shape[1]/2+50)] = np.ones(100)
+psf /= 100
+
+P=np.fft.fft2(psf)
+
+d = np.fft.fftshift(np.fft.ifft2(H*P).real)
+d = d + noise
+weaker_motion_image = d
+D=np.fft.fft2(d)
+
+
+deconv = ((np.conj(P) * image_spectrum)/((np.square(np.abs(P)) * image_spectrum) + noise_spectrum))*D
+weaker_motion_restored = np.fft.fftshift(np.fft.ifft2(deconv).real)
+
+d = np.fft.fftshift(np.fft.ifft2(H*P).real)
+
+# Weaker noise: STD_DEV = 1
+STD_DEV = 0.1
+noise = np.random.normal(size = H.shape, loc=0, scale=STD_DEV)
+
+d = d + noise
+weaker_noise_image = d
+D=np.fft.fft2(d)
+
+noise_spectrum = np.square(np.abs(np.fft.fft2(noise)))
+
+deconv = ((np.conj(P) * image_spectrum)/((np.square(np.abs(P)) * image_spectrum) + noise_spectrum))*D
+weaker_noise_restored = np.fft.fftshift(np.fft.ifft2(deconv).real)
+
+
+plt.show()
+
+plt.subplot(221)
+plt.imshow(weaker_motion_image,cmap="gray",vmin=0,vmax=255)
+plt.title("Image with weaker motion blur")
+plt.colorbar()
+
+plt.subplot(222)
+plt.imshow(weaker_motion_restored,cmap="gray",vmin=0,vmax=255)
+plt.title("Deconvolved image with weaker motion blur")
+plt.colorbar()
+
+plt.subplot(223)
+plt.imshow(weaker_noise_image,cmap="gray",vmin=0,vmax=255)
+plt.title("Image with weaker noise")
+plt.colorbar()
+
+plt.subplot(224)
+plt.imshow(weaker_noise_restored,cmap="gray",vmin=0,vmax=255)
+plt.title("Deconvolved image with weaker noise")
+plt.colorbar()
 
 plt.show()
