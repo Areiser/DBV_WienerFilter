@@ -44,35 +44,32 @@ image_pds = np.square(np.abs(np.fft.fft2(image)))
 perfect_deconv = ((np.conj(H) * image_pds)/(((np.conj(H) * H) * image_pds) + noise_pds))*G
 restored_image_perfect = np.fft.fftshift(np.fft.ifft2(perfect_deconv).real)
 
-plt.subplot(231)
+plt.imshow(psf,cmap="gray")
+plt.show()
+
+plt.subplot(121)
 plt.imshow(image,cmap="gray")
-plt.colorbar()
 plt.title("Original image")
 
-plt.subplot(232)
-plt.imshow(psf,cmap="gray")
-plt.title("Point spread function")
-plt.colorbar()
-plt.subplot(233)
 
+plt.subplot(122)
 plt.imshow(g,cmap="gray")
 plt.title("Motion blurred and noisy image")
-plt.colorbar()
+plt.show()
 
-plt.subplot(234)
 plt.imshow(restored_image_perfect,cmap="gray",vmin=0,vmax=255)
 plt.title("Deconvolved image using Power density spectrum")
-plt.colorbar()
+plt.show()
 
-plt.subplot(235)
+plt.subplot(121)
 plt.imshow(restored_image_high_k,cmap="gray",vmin=0,vmax=255)
 plt.title("Deconvolved image using high K")
-plt.colorbar()
 
-plt.subplot(236)
+plt.subplot(122)
 plt.imshow(restored_image_low_k,cmap="gray",vmin=0,vmax=255)
 plt.title("Deconvolved image using low K")
-plt.colorbar()
+
+plt.show()
 
 ### Perfect deconvolution with weaker motion blur
 
@@ -107,27 +104,21 @@ noise_pds = np.square(np.abs(np.fft.fft2(noise)))
 deconv = ((np.conj(H) * image_pds)/(((np.conj(H) * H) * image_pds) + noise_pds))*G
 weaker_noise_restored = np.fft.fftshift(np.fft.ifft2(deconv).real)
 
-
-plt.show()
-
-plt.subplot(221)
+plt.subplot(121)
 plt.imshow(weaker_motion_image,cmap="gray",vmin=0,vmax=255)
 plt.title("Image with weaker motion blur")
-plt.colorbar()
 
-plt.subplot(222)
+plt.subplot(122)
 plt.imshow(weaker_motion_restored,cmap="gray",vmin=0,vmax=255)
 plt.title("Deconvolved image with weaker motion blur")
-plt.colorbar()
+plt.show()
 
-plt.subplot(223)
+plt.subplot(121)
 plt.imshow(weaker_noise_image,cmap="gray",vmin=0,vmax=255)
 plt.title("Image with weaker noise and weaker blur")
-plt.colorbar()
 
-plt.subplot(224)
+plt.subplot(122)
 plt.imshow(weaker_noise_restored,cmap="gray",vmin=0,vmax=255)
 plt.title("Deconvolved image with weaker noise and blur")
-plt.colorbar()
 
 plt.show()
